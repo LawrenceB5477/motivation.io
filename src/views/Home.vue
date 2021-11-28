@@ -8,6 +8,7 @@
       <div class="quote">
         <blockquote class="quote-text">
           {{ quote }}
+          Test
         </blockquote>
         <v-progress-circular
           v-if="loading"
