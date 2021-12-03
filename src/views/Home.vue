@@ -8,7 +8,6 @@
       <div class="quote">
         <blockquote class="quote-text">
           {{ quote }}
-          Test
         </blockquote>
         <v-progress-circular
           v-if="loading"
@@ -24,6 +23,19 @@
       </div>
       <div v-if="!loading" class="controls">
         <v-rating
+          class="d-block d-sm-none"
+          :value="rating"
+          empty-icon="mdi-star-outline"
+          full-icon="mdi-star"
+          hover
+          size="40"
+          length="5"
+          color="yellow darken-2"
+          background-color="yellow darken-2"
+          @input="rateQuote"
+        />
+        <v-rating
+          class="d-none d-sm-block"
           :value="rating"
           empty-icon="mdi-star-outline"
           full-icon="mdi-star"
@@ -44,6 +56,7 @@
 </template>
 
 <script>
+import motivationApi from "@/api/motivationApi";
 import quoteApi from "@/api/quoteApi";
 
 export default {
@@ -63,7 +76,7 @@ export default {
   computed: {
     quote() {
       if (this.loading) {
-        return `"What doesn't kill you makes you stronger"`;
+        return `"Good things come to those that wait"`;
       }
       return `"${this.quoteData.content}"`;
     },
@@ -79,7 +92,6 @@ export default {
       try {
         this.loading = true;
         const randomQuote = await quoteApi.getRandomQuote();
-        console.log(randomQuote.data);
         this.quoteData = randomQuote.data;
       } catch (e) {
         // TODO handle error
@@ -91,11 +103,21 @@ export default {
     },
     async rateQuote(rating) {
       this.rating = rating;
-      this.ratedQuotes.push({
+      const rateRequest = {
         quote: this.quoteData,
         rating,
-      });
-      await this.retrieveQuote();
+      };
+      try {
+        this.loading = true;
+        const res = await motivationApi.rateQuote(rateRequest);
+        this.quoteData = res.data.quote;
+        console.log(res);
+      } catch (e) {
+        // TODO handle error
+        console.log(e);
+      } finally {
+        this.loading = false;
+      }
       this.rating = 0;
     },
   },
@@ -148,7 +170,7 @@ export default {
 }
 
 .quote-text {
-  font-size: 4rem;
+  font-size: 2rem;
   font-weight: bold;
   color: #333;
   margin-bottom: 1.5rem;
@@ -156,7 +178,7 @@ export default {
 
 .speaker {
   display: block;
-  font-size: 2.5rem;
+  font-size: 1rem;
   font-weight: bold;
   color: #333333;
 }
@@ -164,5 +186,15 @@ export default {
 .controls {
   display: flex;
   justify-content: center;
+}
+
+@media only screen and (min-width: 600px) {
+  .quote-text {
+    font-size: 4rem;
+  }
+
+  .speaker {
+    font-size: 2.5rem;
+  }
 }
 </style>

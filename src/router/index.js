@@ -1,6 +1,7 @@
 import Vue from "vue";
 import VueRouter from "vue-router";
 import Home from "../views/Home.vue";
+import store from "../store/index";
 
 Vue.use(VueRouter);
 
@@ -9,6 +10,13 @@ const routes = [
     path: "/",
     name: "Home",
     component: Home,
+    beforeEnter: (to, from, next) => {
+      if (!store.state.loggedIn) {
+        next({ name: "Login" });
+      } else {
+        next();
+      }
+    },
   },
   {
     path: "/create",

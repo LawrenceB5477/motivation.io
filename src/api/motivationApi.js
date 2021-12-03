@@ -18,4 +18,7 @@ export default {
   async logout() {
     return motivationApi.post("/auth/logout");
   },
+  async rateQuote(request) {
+    return motivationApi.post("/quote/rate", request);
+  },
 };
