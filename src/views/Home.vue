@@ -150,6 +150,8 @@ export default {
   },
   async mounted() {
     await this.retrieveQuote();
+    const stats = await motivationApi.getUserStats();
+    this.stats = stats.data;
   },
   computed: {
     quote() {
@@ -172,7 +174,6 @@ export default {
         const randomQuote = await quoteApi.getRandomQuote();
         this.quoteData = randomQuote.data;
       } catch (e) {
-        // TODO handle error
         console.log(e);
         this.errored = true;
       } finally {
@@ -193,7 +194,6 @@ export default {
         this.stats = stats.data;
         console.log(res);
       } catch (e) {
-        // TODO handle error
         console.log(e);
       } finally {
         this.loading = false;
