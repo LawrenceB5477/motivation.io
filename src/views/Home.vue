@@ -1,6 +1,6 @@
 <template>
   <v-container>
-    <div class="quote-block">
+    <div class="quote-block mb-5">
       <div class="boxes">
         <div class="box top-left"></div>
         <div class="box top-right"></div>
@@ -52,6 +52,84 @@
         <div class="box bottom-right"></div>
       </div>
     </div>
+    <v-row v-if="stats" class="align-content-stretch">
+      <v-col cols="12" sm="6">
+        <v-card class="fill-height">
+          <v-card-title> Rating Stats </v-card-title>
+          <v-card-text>
+            <v-row>
+              <v-col>
+                <span class="font-weight-bold ml-4">Star Totals:</span>
+                <v-list dense>
+                  <v-list-item
+                    v-for="(stars, index) in stats.rateNumberTotals"
+                    l
+                    :key="index"
+                  >
+                    <v-list-item-content>
+                      {{ `${index + 1} ${index > 0 ? "Stars" : "Star"}:` }}
+                    </v-list-item-content>
+                    <v-list-item-content class="justify-end">
+                      {{ stars }}
+                    </v-list-item-content>
+                  </v-list-item>
+                </v-list>
+              </v-col>
+              <v-col>
+                <span class="font-weight-bold ml-4">Total Quotes Rated:</span>
+                <v-list>
+                  <v-list-item>
+                    <v-list-item-content>
+                      <span>{{ stats.ratedQuoteTotal }}</span>
+                    </v-list-item-content>
+                  </v-list-item>
+                </v-list>
+              </v-col>
+            </v-row>
+          </v-card-text>
+        </v-card>
+      </v-col>
+      <v-col cols="12" sm="6">
+        <v-card>
+          <v-card-title> Tag Stats </v-card-title>
+          <v-card-text>
+            <v-row>
+              <v-col cols>
+                <span class="font-weight-bold ml-4">Totals: </span>
+                <v-list dense>
+                  <v-list-item
+                    v-for="([tag, num], index) in Object.entries(
+                      stats.tagTotals.tagTotals
+                    ).slice(0, 5)"
+                    l
+                    :key="index"
+                  >
+                    <v-list-item-content>
+                      {{ tag }}
+                    </v-list-item-content>
+                    <v-list-item-content class="justify-end">
+                      {{ num }}
+                    </v-list-item-content>
+                  </v-list-item>
+                </v-list>
+              </v-col>
+              <v-col>
+                <div class="d-flex justify-space-between">
+                  <span class="font-weight-bold ml-4">Most Liked tag: </span>
+                </div>
+                <v-list>
+                  <v-list-item>
+                    <v-list-item-content>
+                      <span>{{ stats.tagTotals.max }}</span>
+                    </v-list-item-content>
+                  </v-list-item>
+                </v-list>
+              </v-col>
+            </v-row>
+          </v-card-text>
+        </v-card>
+      </v-col>
+    </v-row>
   </v-container>
 </template>
 
@@ -67,7 +145,7 @@ export default {
       loading: true,
       errored: false,
       quoteData: {},
-      ratedQuotes: [],
+      stats: undefined,
     };
   },
   async mounted() {
@@ -110,7 +188,9 @@ export default {
       try {
         this.loading = true;
         const res = await motivationApi.rateQuote(rateRequest);
+        const stats = await motivationApi.getUserStats();
         this.quoteData = res.data.quote;
+        this.stats = stats.data;
         console.log(res);
       } catch (e) {
         // TODO handle error

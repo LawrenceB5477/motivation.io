@@ -21,4 +21,7 @@ export default {
   async rateQuote(request) {
     return motivationApi.post("/quote/rate", request);
   },
+  async getUserStats() {
+    return motivationApi.get("/user/stats");
+  },
 };
